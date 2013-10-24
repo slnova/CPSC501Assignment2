@@ -43,7 +43,26 @@ public class ObjectInspector
 		inspectMethods(ObjClass);
 		
 		inspectConstructors(ObjClass);
-		
+	
+		if(!ObjClass.isPrimitive() && ObjClass.isArray())
+			arrayInfo(obj, recursive);
+	}
+    
+    private void arrayInfo(Object obj, boolean recursive)
+	{
+		Object iObj;
+		for(int j = 0; j < Array.getLength(obj); j++)
+		{
+			iObj = Array.get(obj,j);
+			if(iObj != null)
+			{
+				System.out.println("----------- ARRAY INFO (" + (j+1) + ") -----------");
+				inspect(iObj, iObj.getClass(), recursive);
+				System.out.println("----------- ARRAY INFO (" + (j+1) + ") INSPECTION DONE -----------");
+			}
+			else
+				System.out.println("\tindex " + j + ": " + iObj);
+			}   
 	}
     
     //--------------------------------------------------------------
@@ -118,6 +137,7 @@ public class ObjectInspector
 	}
     
     //-------------------------------------------------------------
+    
     private void inspectSuperclasses(Object obj, Class ObjClass, boolean recursive)
 	{
 		if(ObjClass.getSuperclass() != null)
@@ -131,7 +151,8 @@ public class ObjectInspector
 	}
 
 
-	//-----------------------------------------------------------
+	//---------------------------------------------------------------
+    
 	private void inspectInterfaces(Object obj, Class ObjClass, boolean recursive)
 	{
 		Class []listOfInterfaces = ObjClass.getInterfaces();
@@ -158,6 +179,7 @@ public class ObjectInspector
 
 		System.out.println();//for formatting
 	}
+	
 	//----------------------------------------------------------------
     
     private void inspectFieldClasses(Object obj,Class ObjClass,
