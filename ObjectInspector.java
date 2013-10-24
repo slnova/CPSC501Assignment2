@@ -1,5 +1,4 @@
 /*==========================================================================
-File: ObjectInspector.java
 Assignment 2 - CPSC 501
 
 Stuart Laing 10081955
@@ -43,25 +42,31 @@ public class ObjectInspector
 		inspectMethods(ObjClass);
 		
 		inspectConstructors(ObjClass);
+		
+		System.out.println("Fields:");
+		inspectFields(obj, ObjClass,objectsToInspect, recursive);
 	
 		if(!ObjClass.isPrimitive() && ObjClass.isArray())
 			arrayInfo(obj, recursive);
+		
+		if(recursive)
+			inspectFieldClasses(obj, ObjClass, objectsToInspect, recursive);
 	}
     
     private void arrayInfo(Object obj, boolean recursive)
 	{
-		Object iObj;
+		Object arrayObject;
 		for(int j = 0; j < Array.getLength(obj); j++)
 		{
-			iObj = Array.get(obj,j);
-			if(iObj != null)
+			arrayObject = Array.get(obj,j);
+			if(arrayObject != null)
 			{
 				System.out.println("----------- ARRAY INFO (" + (j+1) + ") -----------");
-				inspect(iObj, iObj.getClass(), recursive);
+				inspect(arrayObject, arrayObject.getClass(), recursive);
 				System.out.println("----------- ARRAY INFO (" + (j+1) + ") INSPECTION DONE -----------");
 			}
 			else
-				System.out.println("\tindex " + j + ": " + iObj);
+				System.out.println("\tindex " + j + ": " + arrayObject);
 			}   
 	}
     
@@ -202,31 +207,66 @@ public class ObjectInspector
 			System.out.println("******************");
 		    }
 		catch(Exception exp) { exp.printStackTrace(); }
+		System.out.println("INSPECTING FIELD: " + f.getName() + " DONE" );
 	    }
     }
     //-----------------------------------------------------------
     private void inspectFields(Object obj,Class ObjClass,Vector objectsToInspect)
   
     {
-	
-	if(ObjClass.getDeclaredFields().length >= 1)
-	    {
-		Field f = ObjClass.getDeclaredFields()[0];
-		
-		f.setAccessible(true);
-		
-		if(! f.getType().isPrimitive() ) 
-		    objectsToInspect.addElement( f );
-		
-		try
-		    {
-			
-			System.out.println("Field: " + f.getName() + " = " + f.get(obj));
-		    }
-		catch(Exception e) {}    
-	    }
+    	Object fieldObj = null;
+		Field [] fields = ObjClass.getDeclaredFields();
+		Field.setAccessible(fields, true);
+		Object arrayObject;
 
-	if(ObjClass.getSuperclass() != null)
-	    inspectFields(obj, ObjClass.getSuperclass() , objectsToInspect);
+		try{
+			if(fields.length > 0)
+			{
+				for(int i = 0; i< fields.length; i++)
+				{
+					fieldObj = fields[i].get(obj);
+					System.out.print(fields[i].toString());
+
+					if(fieldObj != null) 
+					{
+						if(fieldObj.getClass().isArray()) 
+						{
+							System.out.println(": ");
+							for(int j = 0; j < Array.getLength(fieldObj); j++)
+							{
+								arrayObject = Array.get(fieldObj,j);
+								if(fieldObj.getClass().getComponentType().isPrimitive())
+									System.out.println("\tindex " + j + ": " + arrayObject);
+
+								else
+								{
+									if(arrayObject != null)
+									{
+										System.out.println("----------- ARRAY ITEM (" + (j+1) + ") -----------");
+										inspect(arrayObject, arrayObject.getClass(), recursive);
+										System.out.println("----------- END ARRAY ITEM (" + (j+1) + ") -----------");
+									}
+									else
+										System.out.println("\tindex " + j + ": " + arrayObject);
+								} 						
+							}    					
+						}
+						else 
+						{
+							System.out.println(" = "  + fields[i].get(obj));
+							if(!fields[i].getType().isPrimitive() && fields[i].get(obj) != null) 
+								objectsToInspect.addElement(fields[i]);
+						}
+					}
+					else 
+						System.out.println(" = null");
+					
+				}
+			}
+			else
+				System.out.println("\tNo Fields");
+		}
+		catch(Exception e) {}   
+	
     }
 }
