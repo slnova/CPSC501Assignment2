@@ -40,7 +40,83 @@ public class ObjectInspector
 
 		inspectInterfaces(obj, ObjClass, recursive);
 		
+		inspectMethods(ObjClass);
+		
+		inspectConstructors(ObjClass);
+		
 	}
+    
+    //--------------------------------------------------------------
+    
+    private void inspectConstructors(Class ObjClass)
+	{
+		Constructor[] consList = ObjClass.getDeclaredConstructors();
+
+		System.out.println("Constructors:");
+		if(consList.length > 0)
+		{
+			for (int j = 0; j < consList.length; j++)
+				System.out.println("\t" + consList[j].toString());
+			
+		}
+		else
+			System.out.println("\tNo Constructors");
+
+		System.out.println();//for formatting
+	}
+    
+    //-------------------------------------------------------------
+    
+    private void inspectMethods(Class ObjClass)
+	{
+		Method [] methods = ObjClass.getDeclaredMethods();
+
+		try
+		{
+			System.out.println("Methods:");
+			if(methods.length > 0)
+			{
+				for ( int i = 0; i < methods.length; i++)
+				{
+					Method m = methods[i];
+
+					String line = "\t" + Modifier.toString(m.getModifiers()) + " ";  
+					line += m.getReturnType().toString() + " ";
+					line += m.getName() + " (";
+
+					Class []argTypes = m.getParameterTypes();
+					for (int j = 0; j < argTypes.length; j++ )
+					{
+						if(j !=  argTypes.length - 1)
+							line += argTypes[j].toString() + ", ";
+						else
+							line += argTypes[j].toString();
+					}
+					line += ") ";
+
+					Class []exTypes = m.getExceptionTypes();
+					for (int j = 0; j < exTypes.length; j++ )
+					{
+						if(j !=  exTypes.length - 1)
+							line += exTypes[j].toString() + ", ";
+						else
+							line += exTypes[j].toString();
+
+					}
+					System.out.println(line);
+				}
+			}
+			else
+				System.out.println("\tNo Methods");
+
+			System.out.println(); //for formatting 
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.toString());
+		}
+	}
+    
     //-------------------------------------------------------------
     private void inspectSuperclasses(Object obj, Class ObjClass, boolean recursive)
 	{
