@@ -1,17 +1,13 @@
 /*==========================================================================
 File: ObjectInspector.java
-Purpose:Demo Object inspector for the Asst2TestDriver
+Assignment 2 - CPSC 501
 
-Location: University of Calgary, Alberta, Canada
-Created By: Jordan Kidney
-Created on:  Oct 23, 2005
-Last Updated: Oct 23, 2005
+Stuart Laing 10081955
+Assignment 2 
+October 24th 2013
 
-***********************************************************************
-If you are going to reproduce this code in any way for your asignment 
-rember to include my name at the top of the file toindicate where you
-got the original code from
-***********************************************************************
+The base code for this assignment was provided to us and all credit for it
+goes to Jordan Kenny.
 
 
 ========================================================================*/
@@ -27,19 +23,67 @@ public class ObjectInspector
     //-----------------------------------------------------------
     public void inspect(Object obj, boolean recursive)
     {
-	Vector objectsToInspect = new Vector();
-	Class ObjClass = obj.getClass();
+    	Class objClass = obj.getClass();
 
-	System.out.println("inside inspector: " + obj + " (recursive = "+recursive+")");
-	
-	//inspect the current class
-	inspectFields(obj, ObjClass,objectsToInspect);
-	
-	if(recursive)
-	    inspectFieldClasses( obj, ObjClass, objectsToInspect, recursive);
+		inspect(obj, objClass, recursive);
 	   
     }
     //-----------------------------------------------------------
+    
+    public void inspect(Object obj, Class ObjClass, boolean recursive)
+	{
+		Vector objectsToInspect = new Vector();
+
+		System.out.println("Inside Inspector: " + ObjClass.getCanonicalName() + " (recursive = "+recursive+")\n");	
+
+		inspectSuperclasses(obj, ObjClass, recursive);
+
+		inspectInterfaces(obj, ObjClass, recursive);
+		
+	}
+    //-------------------------------------------------------------
+    private void inspectSuperclasses(Object obj, Class ObjClass, boolean recursive)
+	{
+		if(ObjClass.getSuperclass() != null)
+		{
+			System.out.println("----------- SUPERCLASS: " + ObjClass.getSuperclass().getName() + " -----------");
+			inspect(obj, ObjClass.getSuperclass(), recursive);
+			System.out.println("----------- SUPERCLASS " + ObjClass.getSuperclass().getName() + " INSPECTION DONE -----------\n");
+		}
+		else
+			System.out.println("\tNo Superclass");
+	}
+
+
+	//-----------------------------------------------------------
+	private void inspectInterfaces(Object obj, Class ObjClass, boolean recursive)
+	{
+		Class []listOfInterfaces = ObjClass.getInterfaces();
+
+		if(listOfInterfaces.length > 0)
+		{
+			System.out.println(ObjClass.toString() + " Implements these interfaces: \n");
+
+			for ( int i = 0; i < listOfInterfaces.length; i++ )
+				if(listOfInterfaces[i] != null)
+				{
+
+					System.out.println("----------- INTERFACE (" + (i+1) + "): " + listOfInterfaces[i].getName() + " -----------");
+					inspect(obj, listOfInterfaces[i], recursive);
+					System.out.println("----------- INTERFACE (" + (i+1) + "): " + listOfInterfaces[i].getName() + " INSPECTION DONE -----------");
+
+				}
+
+			System.out.println("----------- ALL INTERFACE INSPECTIONS DONE -----------\n");
+
+		}
+		else
+			System.out.println("Interfaces: \n\t No Interfaces");
+
+		System.out.println();//for formatting
+	}
+	//----------------------------------------------------------------
+    
     private void inspectFieldClasses(Object obj,Class ObjClass,
 				     Vector objectsToInspect,boolean recursive)
     {
